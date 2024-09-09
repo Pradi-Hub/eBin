@@ -1,8 +1,8 @@
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import Index from "./app/Index"; // Adjust the import path if necessary
-import SuccessScreen from "./app/SuccessScreen"; // Adjust the import path if necessary
+import Index from "./app/Index";
+import SuccessScreen from "./app/SuccessScreen";
 import QRCodeScannerScreen from "./app/QRCodeScannerScreen";
 import ScanHistoryScreen from "./app/ScanHistoryScreen";
 import ReportViewScreen from "./app/ReportViewScreen";
