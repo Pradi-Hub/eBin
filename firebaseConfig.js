@@ -1,6 +1,14 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getDatabase, ref, push, onValue, update } from "firebase/database";
+import {
+  getDatabase,
+  ref,
+  push,
+  onValue,
+  update,
+  query,
+  orderByChild,
+} from "firebase/database";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -21,4 +29,4 @@ const app = initializeApp(firebaseConfig);
 // Initialize Realtime Database and get a reference to the service
 const database = getDatabase(app);
 
-export { database, ref, push, onValue, update };
+export { database, ref, push, onValue, update, query, orderByChild };

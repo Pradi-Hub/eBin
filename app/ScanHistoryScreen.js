@@ -9,18 +9,18 @@ import {
   Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { database, ref, onValue } from "../firebaseConfig";
+import { database, ref, onValue, query, orderByChild } from "../firebaseConfig";
 import * as FileSystem from "expo-file-system";
 import * as Sharing from "expo-sharing";
 import * as Print from "expo-print";
 import { Platform } from "react-native";
-import * as Permissions from "expo-permissions";
 import * as MediaLibrary from "expo-media-library";
-import { parseISO, compareDesc } from "date-fns";
+import { parse, compareDesc, isToday } from "date-fns";
 
 const ScanHistoryScreen = () => {
   const [selectedTab, setSelectedTab] = useState("Today");
   const [scanData, setScanData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]); // New state for filtered data
   const navigation = useNavigation();
 
   const handleBack = () => {
@@ -28,7 +28,10 @@ const ScanHistoryScreen = () => {
   };
 
   useEffect(() => {
-    const dataRef = ref(database, "RecycleWasteCollection");
+    const dataRef = query(
+      ref(database, "RecycleWasteCollection"),
+      orderByChild("dateAndTime")
+    );
 
     const unsubscribe = onValue(dataRef, (snapshot) => {
       const fetchedData = [];
@@ -36,21 +39,53 @@ const ScanHistoryScreen = () => {
         fetchedData.push({ id: childSnapshot.key, ...childSnapshot.val() });
       });
 
-      console.log("Fetched Data Before Sorting:", fetchedData); // Debug log
+      console.log("Fetched Data:", fetchedData);
 
-      // Sort the fetched data by date in descending order (latest first)
+      // Date format in the data is "MM/dd/yyyy, hh:mm:ss a"
+      const dateFormat = "M/d/yyyy, h:mm:ss a"; // Adjusted to handle single digits in months and hours
+
       const sortedData = fetchedData.sort((a, b) => {
-        // Parse dates using new Date() for non-ISO date strings
-        const dateA = new Date(a.dateAndTime);
-        const dateB = new Date(b.dateAndTime);
-        return compareDesc(dateA, dateB);
+        if (!a.dateAndTime || !b.dateAndTime) {
+          console.error("Missing dateAndTime field:", a, b);
+          return 0;
+        }
+
+        try {
+          // Parse the custom date format
+          const dateA = parse(a.dateAndTime, dateFormat, new Date());
+          const dateB = parse(b.dateAndTime, dateFormat, new Date());
+
+          return compareDesc(dateA, dateB); // Sort in descending order
+        } catch (error) {
+          console.error("Error parsing dates:", error);
+          return 0;
+        }
       });
 
+      console.log("Sorted Data:", sortedData);
       setScanData(sortedData);
+      setFilteredData(sortedData); // Initialize filtered data with sorted data
     });
 
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    // Filter data based on the selected tab
+    if (selectedTab === "Today") {
+      const todayData = scanData.filter((item) => {
+        const itemDate = parse(
+          item.dateAndTime,
+          "M/d/yyyy, h:mm:ss a",
+          new Date()
+        );
+        return isToday(itemDate);
+      });
+      setFilteredData(todayData);
+    } else {
+      setFilteredData(scanData); // Show all data if "All" is selected
+    }
+  }, [selectedTab, scanData]);
 
   const handleViewReport = (item) => {
     navigation.navigate("ReportView", { report: item });
@@ -74,7 +109,7 @@ const ScanHistoryScreen = () => {
       }
 
       // Generate HTML content for the PDF
-      const htmlContent = scanData
+      const htmlContent = filteredData
         .map(
           (item) => `
           <h1>${item.houseAddress}</h1>
@@ -100,13 +135,13 @@ const ScanHistoryScreen = () => {
       if (Platform.OS === "android") {
         try {
           // Check if the file exists at the new path
-          const fileInfo = await FileSystem.getInfoAsync(newUri);
+          const fileInfo = await FileSystem.getInfoAsync(pdfUri);
           if (!fileInfo.exists) {
             throw new Error("The file does not exist at the new path.");
           }
 
           // Try to create an asset and save it to the Media Library
-          const asset = await MediaLibrary.createAssetAsync(newUri);
+          const asset = await MediaLibrary.createAssetAsync(pdfUri);
           await MediaLibrary.createAlbumAsync("Download", asset, false);
           Alert.alert("Success", "PDF saved to Downloads folder");
         } catch (mediaError) {
@@ -122,7 +157,7 @@ const ScanHistoryScreen = () => {
 
       // Optionally, you can share the file after saving
       if (await Sharing.isAvailableAsync()) {
-        await Sharing.shareAsync(newUri);
+        await Sharing.shareAsync(pdfUri);
       } else {
         Alert.alert("Error", "Sharing is not available on this device");
       }
@@ -195,7 +230,7 @@ const ScanHistoryScreen = () => {
       </View>
 
       <FlatList
-        data={scanData}
+        data={filteredData} // Use filtered data instead of scanData
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         contentContainerStyle={styles.list}
@@ -239,34 +274,46 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   tab: {
-    paddingVertical: 10,
+    paddingVertical: 6,
     paddingHorizontal: 20,
-    borderRadius: 20,
-    backgroundColor: "#6EC6B2",
     marginHorizontal: 5,
+    borderRadius: 20,
+    backgroundColor: "#f0f0f0",
   },
   selectedTab: {
     backgroundColor: "#00CE5E",
   },
   tabText: {
-    color: "#ffffff",
+    fontSize: 16,
+    color: "#333",
+  },
+  downloadAllButton: {
+    backgroundColor: "#f0f0f0",
+    borderColor: "#00CE5E",
+    padding: 10,
+    borderRadius: 20,
+    borderWidth: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  downloadAllButtonText: {
+    color: "#333",
     fontWeight: "bold",
   },
   list: {
-    paddingVertical: 10,
+    paddingBottom: 20,
   },
   listItem: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#E6F4F4",
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 10,
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
   },
   fileIcon: {
     width: 40,
     height: 40,
-    marginRight: 15,
+    marginRight: 10,
   },
   itemTextContainer: {
     flex: 1,
@@ -277,29 +324,16 @@ const styles = StyleSheet.create({
   },
   itemSubtitle: {
     fontSize: 14,
-    color: "#ffffff",
+    color: "#555",
   },
   actionIcons: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    width: 90,
-  },
-  actionIcon: {
-    width: 40,
-    height: 40,
-  },
-  downloadAllButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 20,
-    backgroundColor: "#00CE5E",
-    marginHorizontal: 5,
-    justifyContent: "center",
     alignItems: "center",
   },
-  downloadAllButtonText: {
-    color: "#ffffff",
-    fontWeight: "bold",
+  actionIcon: {
+    width: 30,
+    height: 30,
+    marginLeft: 10,
   },
 });
 
