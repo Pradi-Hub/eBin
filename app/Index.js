@@ -14,6 +14,7 @@ import {
 import Icon from "react-native-vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
 import { database, ref, push } from "../firebaseConfig";
+import RNPickerSelect from "react-native-picker-select";
 import colors from "../assets/colors";
 
 const Index = () => {
@@ -70,11 +71,8 @@ const Index = () => {
       isValid = false;
     }
 
-    if (!wasteType.trim()) {
+    if (!wasteType) {
       newErrors.wasteType = "Recycle Waste Type is required";
-      isValid = false;
-    } else if (!isAlphabetic(wasteType)) {
-      newErrors.wasteType = "Recycle Waste Type should contain only letters";
       isValid = false;
     }
 
@@ -167,20 +165,31 @@ const Index = () => {
               <Text style={styles.errorText}>{error.ownerName}</Text>
             </Animated.View>
           )}
+
+          {/* Recycle Waste Type Picker */}
           <View style={styles.LableContainer}>
             <Text style={styles.label}>Recycle Waste Type :</Text>
           </View>
-          <TextInput
-            style={styles.inputBox}
-            placeholder="eg : Paper"
-            value={wasteType}
-            onChangeText={setWasteType}
-          />
-          {error.wasteType && (
-            <Animated.View style={{ opacity: opacityAnim }}>
-              <Text style={styles.errorText}>{error.wasteType}</Text>
-            </Animated.View>
-          )}
+          <View style={styles.pickerContainer}>
+            <RNPickerSelect
+              onValueChange={(value) => setWasteType(value)}
+              items={[
+                { label: "Paper", value: "Paper" },
+                { label: "Plastic", value: "Plastic" },
+                { label: "Glass", value: "Glass" },
+                { label: "Metal", value: "Metal" },
+                { label: "Organic", value: "Organic" },
+              ]}
+              placeholder={{ label: "Select a waste type...", value: null }}
+              style={pickerSelectStyles}
+            />
+            {error.wasteType && (
+              <Animated.View style={{ opacity: opacityAnim }}>
+                <Text style={styles.errorText}>{error.wasteType}</Text>
+              </Animated.View>
+            )}
+          </View>
+
           <View style={styles.LableContainer}>
             <Text style={styles.label}>Weight :</Text>
           </View>
@@ -205,6 +214,27 @@ const Index = () => {
     </ScrollView>
   );
 };
+
+const pickerSelectStyles = StyleSheet.create({
+  inputIOS: {
+    fontSize: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    borderWidth: 2,
+    borderColor: "#00CE5E",
+    borderRadius: 10,
+    color: "black",
+    paddingRight: 30, // to ensure the text is not cut off by the dropdown arrow
+  },
+  inputAndroid: {
+    fontSize: 16,
+    borderWidth: 2,
+    borderColor: "#00CE5E",
+    borderRadius: 10,
+    color: "black",
+    paddingRight: 30, // to ensure the text is not cut off by the dropdown arrow
+  },
+});
 
 const styles = StyleSheet.create({
   container: {
@@ -309,6 +339,13 @@ const styles = StyleSheet.create({
   scrollViewContainer: {
     flexGrow: 1,
     backgroundColor: "#fff",
+  },
+  pickerContainer: {
+    height: 50,
+    margin: 12,
+    borderWidth: 2,
+    borderColor: "#00CE5E",
+    borderRadius: 10,
   },
 });
 
