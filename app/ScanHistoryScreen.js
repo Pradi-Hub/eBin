@@ -185,39 +185,45 @@ const ScanHistoryScreen = () => {
     }
   };
 
-  const renderItem = ({ item }) => (
-    <View style={styles.listItem}>
-      <Image
-        source={require("../assets/images/file-icon.png")}
-        style={styles.fileIcon}
-      />
-      <View style={styles.itemTextContainer}>
-        <Text style={styles.itemTitle}>
-          {item.ownerName || "No Owner Name Available"}
-        </Text>
-        <Text style={styles.itemSubtitle}>
-          {item.reviewStatus || "No Review Status Available"}
-        </Text>
-        <Text style={styles.itemSubtitle}>
-          {item.dateAndTime || "No Date Available"}
-        </Text>
+  const renderItem = ({ item }) => {
+    // Determine the color for review status
+    const reviewStatusColor =
+      item.reviewStatus === "Pending review" ? "#FF0000" : "#555";
+
+    return (
+      <View style={styles.listItem}>
+        <Image
+          source={require("../assets/images/file-icon.png")}
+          style={styles.fileIcon}
+        />
+        <View style={styles.itemTextContainer}>
+          <Text style={styles.itemTitle}>
+            {item.ownerName || "No Owner Name Available"}
+          </Text>
+          <Text style={[styles.itemSubtitle, { color: reviewStatusColor }]}>
+            {item.reviewStatus || "No Review Status Available"}
+          </Text>
+          <Text style={styles.itemSubtitle}>
+            {item.dateAndTime || "No Date Available"}
+          </Text>
+        </View>
+        <View style={styles.actionIcons}>
+          <TouchableOpacity onPress={() => handleViewReport(item)}>
+            <Image
+              source={require("../assets/images/view-icon.png")}
+              style={styles.actionIcon}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleDownload(item)}>
+            <Image
+              source={require("../assets/images/download-icon.png")}
+              style={styles.actionIcon}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
-      <View style={styles.actionIcons}>
-        <TouchableOpacity onPress={() => handleViewReport(item)}>
-          <Image
-            source={require("../assets/images/view-icon.png")}
-            style={styles.actionIcon}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => handleDownload(item)}>
-          <Image
-            source={require("../assets/images/download-icon.png")}
-            style={styles.actionIcon}
-          />
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
+    );
+  };
 
   return (
     <View style={styles.container}>
