@@ -221,17 +221,17 @@ const pickerSelectStyles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 10,
     borderWidth: 2,
-    borderColor: "#00CE5E",
+    borderColor: colors.primary,
     borderRadius: 10,
-    color: "black",
+    color: colors.black,
     paddingRight: 30, // to ensure the text is not cut off by the dropdown arrow
   },
   inputAndroid: {
     fontSize: 16,
     borderWidth: 2,
-    borderColor: "#00CE5E",
+    borderColor: colors.primary,
     borderRadius: 10,
-    color: "black",
+    color: colors.black,
     paddingRight: 30, // to ensure the text is not cut off by the dropdown arrow
   },
 });
@@ -243,7 +243,7 @@ const styles = StyleSheet.create({
     overflow: "auto",
   },
   TopBarContainer: {
-    backgroundColor: "#00CE5E",
+    backgroundColor: colors.primary,
     flex: 0,
     width: "100%",
     borderBottomStartRadius: 70,
@@ -279,24 +279,24 @@ const styles = StyleSheet.create({
   label: {
     paddingLeft: 20,
     fontSize: 24,
-    color: "#00CE5E",
+    color: colors.primary,
   },
   inputBox: {
     height: 50,
     margin: 12,
     borderWidth: 2,
     padding: 10,
-    borderColor: "#00CE5E",
+    borderColor: colors.primary,
     borderRadius: 10,
     ...Platform.select({
       ios: {
-        shadowColor: "black",
+        shadowColor: colors.black,
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 6,
       },
       android: {
-        shadowColor: "black",
+        shadowColor: colors.black,
         shadowOffset: { width: 0, height: 100 },
         shadowOpacity: 1,
         shadowRadius: 2,
@@ -319,7 +319,7 @@ const styles = StyleSheet.create({
     height: 50,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#00CE5E",
+    backgroundColor: colors.primary,
     borderRadius: 15,
   },
   buttonText: {
@@ -338,13 +338,13 @@ const styles = StyleSheet.create({
   },
   scrollViewContainer: {
     flexGrow: 1,
-    backgroundColor: "#fff",
+    backgroundColor: colors.white,
   },
   pickerContainer: {
     height: 50,
     margin: 12,
     borderWidth: 2,
-    borderColor: "#00CE5E",
+    borderColor: colors.primary,
     borderRadius: 10,
   },
 });

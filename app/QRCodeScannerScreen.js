@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import colors from "../assets/colors";
 
 const QRCodeScannerScreen = () => {
   const navigation = useNavigation();
@@ -59,7 +60,7 @@ const QRCodeScannerScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#ffffff",
+    backgroundColor: colors.white,
     justifyContent: "center",
     alignItems: "center",
     padding: 20,
@@ -79,7 +80,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#00CE5E",
+    color: colors.primary,
     marginBottom: 10,
   },
   subtitle: {
@@ -104,22 +105,22 @@ const styles = StyleSheet.create({
   qrImage: {
     width: 150,
     height: 150,
-    tintColor: "#00CE5E", // Adjust the color to match the theme
+    tintColor: colors.primary, // Adjust the color to match the theme
   },
   scanButton: {
-    backgroundColor: "#00CE5E",
+    backgroundColor: colors.primary,
     paddingVertical: 15,
     paddingHorizontal: 60,
     borderRadius: 25,
     alignItems: "center",
   },
   scanButtonText: {
-    color: "#fff",
+    color: colors.white,
     fontSize: 16,
     fontWeight: "bold",
   },
   requestButton: {
-    backgroundColor: "#00CE5E",
+    backgroundColor: colors.primary,
     paddingVertical: 15,
     paddingHorizontal: 60,
     marginTop: 25,
@@ -127,7 +128,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   requestButtonText: {
-    color: "#fff",
+    color: colors.white,
     fontSize: 16,
     fontWeight: "bold",
   },

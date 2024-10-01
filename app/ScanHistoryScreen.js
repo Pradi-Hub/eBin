@@ -16,6 +16,7 @@ import * as Print from "expo-print";
 import { Platform } from "react-native";
 import * as MediaLibrary from "expo-media-library";
 import { parse, compareDesc, isToday } from "date-fns";
+import colors from "../assets/colors";
 
 const ScanHistoryScreen = () => {
   const [selectedTab, setSelectedTab] = useState("Today");
@@ -98,7 +99,6 @@ const ScanHistoryScreen = () => {
 
   const handleDownloadAll = async () => {
     try {
-      // Request permission to access the device's media library
       const { status } = await MediaLibrary.requestPermissionsAsync();
       if (status !== "granted") {
         Alert.alert(
@@ -108,54 +108,72 @@ const ScanHistoryScreen = () => {
         return;
       }
 
-      // Generate HTML content for the PDF
-      const htmlContent = filteredData
-        .map(
-          (item) => `
-          <h1>${item.houseAddress}</h1>
-          <p>Location: ${item.ownerNam}</p>
-          <p>Date: ${item.readableDate}</p>
-          <hr/>
-        `
-        )
-        .join("");
+      const htmlContent = `
+      <html>
+      <head>
+        <style>
+          table {
+            width: 100%;
+            border-collapse: collapse;
+          }
+          th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+          }
+          th {
+            background-color: #00CE5E;
+            color: white;
+          }
+        </style>
+      </head>
+      <body>
+        <h1>Scan History Report</h1>
+        <table>
+          <tr>
+            <th>House Address</th>
+            <th>Owner Name</th>
+            <th>Date</th>
+          </tr>
+          ${filteredData
+            .map(
+              (item) => `
+              <tr>
+                <td>${item.houseAddress}</td>
+                <td>${item.ownerName}</td>
+                <td>${item.readableDate}</td>
+              </tr>
+            `
+            )
+            .join("")}
+        </table>
+      </body>
+      </html>
+    `;
 
-      // Create PDF from HTML content using expo-print
       const { uri: pdfUri } = await Print.printToFileAsync({
         html: htmlContent,
       });
 
-      // Check if the URI is valid
-      if (!pdfUri) {
-        throw new Error("Failed to create PDF file. The URI is invalid.");
+      console.log("PDF file created at:", pdfUri); // Log PDF URI
+
+      // Check if the file exists
+      const fileInfo = await FileSystem.getInfoAsync(pdfUri);
+      if (!fileInfo.exists) {
+        throw new Error("The file does not exist at the new path.");
       }
 
-      console.log("PDF file created at:", pdfUri); // Debugging log to verify the file path
-
-      if (Platform.OS === "android") {
-        try {
-          // Check if the file exists at the new path
-          const fileInfo = await FileSystem.getInfoAsync(pdfUri);
-          if (!fileInfo.exists) {
-            throw new Error("The file does not exist at the new path.");
-          }
-
-          // Try to create an asset and save it to the Media Library
-          const asset = await MediaLibrary.createAssetAsync(pdfUri);
-          await MediaLibrary.createAlbumAsync("Download", asset, false);
-          Alert.alert("Success", "PDF saved to Downloads folder");
-        } catch (mediaError) {
-          console.error("MediaLibrary error:", mediaError);
-          Alert.alert(
-            "Error",
-            "Failed to save the PDF to the Downloads folder."
-          );
-        }
-      } else {
-        // Handle for iOS or other platforms if needed
+      // Attempt to create an asset and save it
+      const asset = await MediaLibrary.createAssetAsync(pdfUri);
+      if (!asset) {
+        throw new Error("Failed to create asset.");
       }
 
-      // Optionally, you can share the file after saving
+      // Optionally create an album if you want to organize the saved PDFs
+      await MediaLibrary.createAlbumAsync("Download", asset, false);
+      Alert.alert("Success", "PDF saved to Downloads folder");
+
+      // Share the PDF file after saving
       if (await Sharing.isAvailableAsync()) {
         await Sharing.shareAsync(pdfUri);
       } else {
@@ -174,9 +192,15 @@ const ScanHistoryScreen = () => {
         style={styles.fileIcon}
       />
       <View style={styles.itemTextContainer}>
-        <Text style={styles.itemTitle}>{item.name}</Text>
-        <Text style={styles.itemSubtitle}>{item.location}</Text>
-        <Text style={styles.itemSubtitle}>{item.readableDate}</Text>
+        <Text style={styles.itemTitle}>
+          {item.ownerName || "No Owner Name Available"}
+        </Text>
+        <Text style={styles.itemSubtitle}>
+          {item.reviewStatus || "No Review Status Available"}
+        </Text>
+        <Text style={styles.itemSubtitle}>
+          {item.dateAndTime || "No Date Available"}
+        </Text>
       </View>
       <View style={styles.actionIcons}>
         <TouchableOpacity onPress={() => handleViewReport(item)}>
@@ -242,7 +266,7 @@ const ScanHistoryScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#ffffff",
+    backgroundColor: colors.white,
     paddingHorizontal: 20,
     marginTop: 70,
   },
@@ -266,7 +290,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 22,
     fontWeight: "bold",
-    color: "#00CE5E",
+    color: colors.primary,
   },
   tabsContainer: {
     flexDirection: "row",
@@ -278,18 +302,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     marginHorizontal: 5,
     borderRadius: 20,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: colors.grey,
   },
   selectedTab: {
-    backgroundColor: "#00CE5E",
+    backgroundColor: colors.primary,
   },
   tabText: {
     fontSize: 16,
-    color: "#333",
+    color: colors.black,
   },
   downloadAllButton: {
-    backgroundColor: "#f0f0f0",
-    borderColor: "#00CE5E",
+    backgroundColor: colors.grey,
+    borderColor: colors.primary,
     padding: 10,
     borderRadius: 20,
     borderWidth: 1,
@@ -297,7 +321,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   downloadAllButtonText: {
-    color: "#333",
+    color: colors.black,
     fontWeight: "bold",
   },
   list: {
@@ -324,7 +348,7 @@ const styles = StyleSheet.create({
   },
   itemSubtitle: {
     fontSize: 14,
-    color: "#555",
+    color: colors.subitm,
   },
   actionIcons: {
     flexDirection: "row",

@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import colors from "../assets/colors";
 
 const SuccessScreen = () => {
   const navigation = useNavigation();
@@ -55,7 +56,7 @@ const SuccessScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.white,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -78,7 +79,7 @@ const styles = StyleSheet.create({
   },
   messageContainer: {
     width: "80%",
-    backgroundColor: "#E6F2F1",
+    backgroundColor: colors.lprimary,
     borderRadius: 20,
     paddingVertical: 30,
     paddingHorizontal: 20,
@@ -88,37 +89,37 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: "#00CE5E",
+    backgroundColor: colors.primary,
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 20,
   },
   checkIcon: {
     fontSize: 70,
-    color: "#fff",
+    color: colors.white,
   },
   successText: {
     fontSize: 20,
-    color: "#00CE5E",
+    color: colors.primary,
     fontWeight: "700",
     textAlign: "center",
     marginBottom: 20,
   },
   qouteText: {
     fontSize: 16,
-    color: "#00CE5E",
+    color: colors.primary,
     fontWeight: "bold",
     textAlign: "center",
     marginTop: 20,
   },
   okButton: {
-    backgroundColor: "#00CE5E",
+    backgroundColor: colors.primary,
     paddingVertical: 10,
     paddingHorizontal: 40,
     borderRadius: 20,
   },
   okButtonText: {
-    color: "#fff",
+    color: colors.white,
     fontSize: 24,
   },
 });

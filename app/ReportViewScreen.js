@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { useRoute } from "@react-navigation/native";
 import { useNavigation } from "@react-navigation/native";
 import { database, ref, update, onValue } from "../firebaseConfig";
+import colors from "../assets/colors";
 
 const ReportViewScreen = () => {
   const route = useRoute();
@@ -106,31 +107,31 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 20,
-    color: "#00CE5E",
+    color: colors.primary,
   },
   label: {
     fontSize: 18,
     marginBottom: 10,
   },
   completeButton: {
-    backgroundColor: "#00CE5E",
+    backgroundColor: colors.primary,
     padding: 10,
     borderRadius: 20,
     marginVertical: 10,
   },
   completeButtonText: {
-    color: "#ffffff",
+    color: colors.white,
     textAlign: "center",
     fontWeight: "bold",
     fontSize: 18,
   },
   backButton: {
-    backgroundColor: "#6EC6B2",
+    backgroundColor: colors.primary,
     padding: 10,
     borderRadius: 20,
   },
   backButtonText: {
-    color: "#ffffff",
+    color: colors.white,
     textAlign: "center",
     fontWeight: "bold",
     fontSize: 20,
